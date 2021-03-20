@@ -15,7 +15,7 @@
   max_n_cpus: 1
   score_metric: gain liq stuck
   # set sliding window size to 1.0 to do only one backtest for whole period
-  sliding_window_size: 0.5
+  sliding_window_size: 1.0
   sliding_window_step: 0.15
   break_on:
   [
