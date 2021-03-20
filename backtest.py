@@ -19,6 +19,9 @@ from binance import fetch_trades as binance_fetch_trades
 
 from typing import Iterator, Callable
 
+import tracemalloc
+tracemalloc.start()
+
 aiomultiprocess.set_start_method("fork")
 
 def get_score_func(key: str) -> Callable:
@@ -231,7 +234,6 @@ def plot_fills(df, fdf, side_: int = 0, liq_thr=0.1):
 
     if side_ >= 0:
         longs = fdf[fdf.pos_side == 'long']
-        #print('debug long', longs)
         le = longs[longs.type.str.endswith('entry')]
         lc = longs[longs.type == 'close']
         le.price.plot(style='b.')
@@ -899,7 +901,13 @@ async def jackrabbit_multi_core(results: dict,
 
 def jackrabbit_wrap(ticks: [dict], backtest_config: dict) -> dict:
     start_ts = time()
+    print('\n\n\nmem debug\n')
+    snapshot = tracemalloc.take_snapshot()
     fills, did_finish = backtest(ticks, backtest_config)
+    top_stats = snapshot.statistics('lineno')
+    for stat in top_stats[:10]:
+        print(stat)
+    print('\nend mem debug\n\n\n')
     elapsed = time() - start_ts
     if not did_finish or not fills:
         return {}, None
